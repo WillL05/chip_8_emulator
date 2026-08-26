@@ -21,15 +21,24 @@ bool Chip8::loadROM(const char* filename) {
     file.seekg(0, ios::beg);
     file.read((char*)&memory[pc],end_pos);
     
-    // Loop through the first 16 bytes of the game
-    for (int i = 0; i < 16; i++) {
-        // We add 0x200 to 'i' because that is where the game starts!
-        // The + prefix forces C++ to print the actual number instead of trying to read it as a character
-        std::cout << std::hex << +(memory[0x200 + i]) << " ";
-    }
-    std::cout << std::endl;
+    // // Loop through the first 16 bytes of the game
+    // for (int i = 0; i < 16; i++) {
+    //     // We add 0x200 to 'i' because that is where the game starts!
+    //     // The + prefix forces C++ to print the actual number instead of trying to read it as a character
+    //     std::cout << std::hex << +(memory[0x200 + i]) << " ";
+    // }
+    // std::cout << std::endl;
     return true;
 }   
+
+uint16_t Chip8::cycle(){
+    uint16_t opcode;
+    uint16_t first_byte = memory[pc];
+    opcode = first_byte << 8;
+    opcode = opcode | memory[pc+1];
+    pc+=2; 
+    return opcode;
+}
 
 
 int main(int argc, char* argv[]) {
@@ -39,5 +48,6 @@ int main(int argc, char* argv[]) {
     }
     Chip8 myEmulator;
     myEmulator.loadROM(argv[1]);
+    myEmulator.cycle();
     return 0;
 }

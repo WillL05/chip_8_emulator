@@ -5,7 +5,10 @@ class Chip8 {
 public:
     // Constructor (runs automatically when the emulator starts)
     Chip8();
+
     bool loadROM(const char* filename);
+
+    uint16_t cycle();
 
 private:
     // The CHIP-8 has exactly 4,096 bytes of memory
