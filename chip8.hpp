@@ -4,6 +4,7 @@
 class Chip8 {
 public:
     // Constructor (runs automatically when the emulator starts)
+    Chip8();
     bool loadROM(const char* filename);
 
 private:

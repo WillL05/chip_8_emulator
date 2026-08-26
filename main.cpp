@@ -9,31 +9,35 @@ Chip8::Chip8() {
     std::cout << "CHIP-8 CPU Initialized. Program Counter set to 0x200." << endl;
 }
 
-bool Chip8::loadROM(const char* filename){
+bool Chip8::loadROM(const char* filename) {
     std::ifstream file(filename, std::ios::in | std::ios::binary | std::ios::ate );
     if (!file){
         cerr << "Error opening file";
         return false;
     }
-    string s;
-    file >> s;
+    
     auto end_pos = file.tellg();
     cout << "Address of pointer: " << end_pos << endl;
     file.seekg(0, ios::beg);
+    file.read((char*)&memory[pc],end_pos);
     
-    size_t str_length;
-    file.read(reinterpret_cast<char *>(&str_length),sizeof(str_length));
-
-    char *buffer = new char[str_length + 1];
-    file.read(buffer,str_length);
-    buffer[str_length] = '\0';
-    Chip8.memory[pc];
+    // Loop through the first 16 bytes of the game
+    for (int i = 0; i < 16; i++) {
+        // We add 0x200 to 'i' because that is where the game starts!
+        // The + prefix forces C++ to print the actual number instead of trying to read it as a character
+        std::cout << std::hex << +(memory[0x200 + i]) << " ";
+    }
+    std::cout << std::endl;
+    return true;
 }   
 
 
-int main() {
-    
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <ROM_Filename>" << std::endl;
+        return 1; // Exit with an error code
+    }
     Chip8 myEmulator;
-    
+    myEmulator.loadROM(argv[1]);
     return 0;
 }
