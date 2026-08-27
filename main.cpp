@@ -3,6 +3,7 @@
 #include <fstream>
 #include "cstring"
 using namespace std;
+#include <format>
 
 Chip8::Chip8() {
     pc = 0x200; 
@@ -31,13 +32,72 @@ bool Chip8::loadROM(const char* filename) {
     return true;
 }   
 
-uint16_t Chip8::cycle(){
+void Chip8::cycle(){
     uint16_t opcode;
     uint16_t first_byte = memory[pc];
     opcode = first_byte << 8;
     opcode = opcode | memory[pc+1];
     pc+=2; 
-    return opcode;
+    switch(opcode & 0xF000){
+        case 0x0000:
+            extract_data(opcode);
+            break;
+
+        case 0x1000:
+            extract_data(opcode);
+            break;
+
+        case 0x2000:
+            extract_data(opcode);
+            break;
+
+        case 0x3000:
+            extract_data(opcode);
+            break;
+
+        case 0x4000:
+            extract_data(opcode);
+            break;
+
+        case 0x5000:
+            extract_data(opcode);
+            break;
+        case 0x6000:
+            extract_data(opcode);
+            break;
+        case 0x7000:
+            extract_data(opcode);
+            break;
+        case 0x8000:
+            extract_data(opcode);
+            break;
+        case 0x9000:
+            extract_data(opcode);
+            break;
+        case 0xA000:
+            extract_data(opcode);
+            break;
+        case 0xB000:
+            extract_data(opcode);
+            break;
+        case 0xC000:
+            extract_data(opcode);
+            break;
+        case 0xD000:
+            extract_data(opcode);
+            break;
+        case 0xE000:
+            extract_data(opcode);
+            break;
+        case 0xF000:
+            extract_data(opcode);
+            break;
+        
+        default:
+            std::cerr << "Unknown instruction"<< std::endl;
+            break;
+    }
+
 }
 
 
@@ -50,4 +110,8 @@ int main(int argc, char* argv[]) {
     myEmulator.loadROM(argv[1]);
     myEmulator.cycle();
     return 0;
+}
+
+uint16_t Chip8::extract_data(uint16_t opcode){
+    return opcode & 0x0F00, opcode & 0x0FFF;
 }
