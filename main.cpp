@@ -39,65 +39,204 @@ void Chip8::cycle(){
     opcode = opcode | memory[pc+1];
     pc+=2; 
     switch(opcode & 0xF000){
-        case 0x0000:
-            extract_data(opcode);
+        case 0x0000: {
+            uint16_t last_three_digits = opcode & 0x0FFF;
             break;
+        }
 
-        case 0x1000:
-            extract_data(opcode);
+        case 0x1000:{
+            uint16_t last_three_digits = opcode & 0x0FFF;
             break;
+        }
 
-        case 0x2000:
-            extract_data(opcode);
+        case 0x2000:{
+            uint16_t last_three_digits = opcode & 0x0FFF;
             break;
+        }
 
-        case 0x3000:
-            extract_data(opcode);
+        case 0x3000:{
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint16_t last_two_digits = opcode & 0x0FF;
             break;
+        }
 
-        case 0x4000:
-            extract_data(opcode);
+        case 0x4000:{
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint16_t last_two_digits = opcode & 0x0FF;
             break;
+        }
 
-        case 0x5000:
-            extract_data(opcode);
+        case 0x5000:{
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint8_t third_digit = (opcode & 0x00F0) >> 4;
             break;
-        case 0x6000:
-            extract_data(opcode);
+        }
+
+        case 0x6000:{
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint16_t last_two_digits = opcode & 0x0FF;
             break;
-        case 0x7000:
-            extract_data(opcode);
+        }
+
+        case 0x7000:{
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint16_t last_two_digits = opcode & 0x0FF;
             break;
-        case 0x8000:
-            extract_data(opcode);
+        }
+
+        case 0x8000:{
+            switch(opcode & 0x000F){
+                case 0x0000:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x0001:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x0002:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x0003:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x0004:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x0005:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x0006:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x0007:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                case 0x000E:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    break;
+                }
+                default:
+                    std::cerr << "Unknown instruction"<< std::endl;
+                    break;
+                
+            }
             break;
-        case 0x9000:
-            extract_data(opcode);
+        }
+
+        case 0x9000:{
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint8_t third_digit = (opcode & 0x00F0) >> 4;
             break;
-        case 0xA000:
-            extract_data(opcode);
+        }
+            
+        case 0xA000:{
+            uint16_t last_three_digits = opcode & 0x0FFF;
             break;
-        case 0xB000:
-            extract_data(opcode);
+        }
+
+        case 0xB000:{
+            uint16_t last_three_digits = opcode & 0x0FFF;
             break;
-        case 0xC000:
-            extract_data(opcode);
+        }
+            
+        case 0xC000:{
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint16_t last_two_digits = opcode & 0x0FF;
             break;
-        case 0xD000:
-            extract_data(opcode);
+        }
+
+        case 0xD000:{
+            
+            uint8_t second_digit = (opcode & 0x0F00) >> 8;
+            uint8_t third_digit = (opcode & 0x00F0) >> 4;
+            uint8_t last_digit = (opcode & 0x000F);
             break;
-        case 0xE000:
-            extract_data(opcode);
+        }
+
+        case 0xE000:{
+            switch(opcode & 0x00FF){
+                case 0x009E:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x00A1:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                default:
+                    std::cerr << "Unknown instruction"<< std::endl;
+                    break;
+            }
+
             break;
-        case 0xF000:
-            extract_data(opcode);
+        }
+
+        case 0xF000:{
+            switch (opcode & 0x00FF){
+                case 0x0007:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x000A:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+
+                }
+                case 0x0015:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x0018:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x001E:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x0029:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x0033:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x0055:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                case 0x0065:{
+                    uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    break;
+                }
+                default:
+                    std::cerr << "Unknown instruction"<< std::endl;
+                    break;
+            }
             break;
+        }
         
         default:
             std::cerr << "Unknown instruction"<< std::endl;
             break;
     }
-
 }
 
 
@@ -112,6 +251,3 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-uint16_t Chip8::extract_data(uint16_t opcode){
-    return opcode & 0x0F00, opcode & 0x0FFF;
-}

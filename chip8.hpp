@@ -9,7 +9,6 @@ public:
     bool loadROM(const char* filename);
 
     void cycle();
-    uint16_t extract_data(uint16_t opcode);
 
 private:
     // The CHIP-8 has exactly 4,096 bytes of memory
