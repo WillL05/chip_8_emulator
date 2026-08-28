@@ -40,8 +40,16 @@ void Chip8::cycle(){
     pc+=2; 
     switch(opcode & 0xF000){
         case 0x0000: {
-            uint16_t last_three_digits = opcode & 0x0FFF;
-            break;
+            switch (opcode & 0x0FFF){
+                case 0x00E0:{
+                    break;
+                }
+                case 0x00EE:{
+                    
+                    break;
+                }
+                
+            }
         }
 
         case 0x1000:{
@@ -89,6 +97,7 @@ void Chip8::cycle(){
                 case 0x0000:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    V[second_digit] = V[third_digit]
                     break;
                 }
                 case 0x0001:{
