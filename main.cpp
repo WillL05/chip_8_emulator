@@ -43,6 +43,11 @@ void Chip8::cycle(){
         case 0x0000: {
             switch (opcode & 0x0FFF){
                 case 0x00E0:{
+                    for(int i = 0; i<= 64; i++){ //length 64 pixels
+                        for(int x = 0; x <= 32; x++){ // width 32 pixels
+                            display[i,x] = 0;
+                        }
+                    }
                     break;
                 }
                 case 0x00EE:{
@@ -224,9 +229,28 @@ void Chip8::cycle(){
 
         case 0xD000:{
             
-            uint8_t second_digit = (opcode & 0x0F00) >> 8;
-            uint8_t third_digit = (opcode & 0x00F0) >> 4;
-            uint8_t last_digit = (opcode & 0x000F);
+            uint8_t second_digit = (opcode & 0x0F00) >> 8; //X
+            uint8_t third_digit = (opcode & 0x00F0) >> 4; // Y
+            uint8_t last_digit = (opcode & 0x000F); // N
+
+            int Xcoords = V[second_digit] % 64;
+            int Ycoords = V[third_digit] % 32;
+            uint8_t buf;
+            V[0x0F] = 0;
+            for(int i = 0; i < last_digit; i++){
+                buf = memory[I + i];
+                for(int x = 0; x < 8; x++){
+                    uint8_t current_bit = (buf & (0x80 >> x));
+                    if (current_bit != 0){
+                    int index = (((Ycoords+i) %32) * 64) + ((Xcoords+x)%64);
+
+                    if(display[index] == 1){
+                        V[0x0F] = 1;
+                    }
+                    display[index] ^= 1;
+                }
+            }
+
             break;
         }
 
