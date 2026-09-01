@@ -242,18 +242,18 @@ void Chip8::cycle(){
                 for(int x = 0; x < 8; x++){
                     uint8_t current_bit = (buf & (0x80 >> x));
                     if (current_bit != 0){
-                    int index = (((Ycoords+i) %32) * 64) + ((Xcoords+x)%64);
+                        int index = (((Ycoords+i) %32) * 64) + ((Xcoords+x)%64);
 
-                    if(display[index] == 1){
-                        V[0x0F] = 1;
+                        if(display[index] == 1){
+                            V[0x0F] = 1;
+                        }
+                        display[index] ^= 1;
                     }
-                    display[index] ^= 1;
                 }
-            }
 
             break;
+            }
         }
-
         case 0xE000:{
             switch(opcode & 0x00FF){
                 case 0x009E:{
