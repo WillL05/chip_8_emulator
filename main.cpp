@@ -97,47 +97,79 @@ void Chip8::cycle(){
                 case 0x0000:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
-                    V[second_digit] = V[third_digit]
+                    V[second_digit] = V[third_digit];
                     break;
                 }
                 case 0x0001:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    V[second_digit] = V[second_digit] | V[third_digit];
                     break;
                 }
                 case 0x0002:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    V[second_digit] = V[second_digit] & V[third_digit];
                     break;
                 }
                 case 0x0003:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    V[second_digit] = V[second_digit] ^ V[third_digit];
                     break;
                 }
                 case 0x0004:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    uint16_t buf = V[second_digit] + V[third_digit];
+                    if(buf > 255){
+                        V[0x0F] = 1;
+                    }
+                    else{
+                        V[0x0F] = 0;
+                    }
+                    V[second_digit] = buf;
                     break;
                 }
                 case 0x0005:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    if( V[second_digit] > V[third_digit]){
+                        V[0x0F] = 1;
+                    }
+                    else{
+                        V[0x0F] = 0;
+                    }
+                    V[second_digit] = V[second_digit] - V[third_digit];
                     break;
                 }
                 case 0x0006:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    uint8_t overflow_check = V[second_digit] & 0x01;
+                    V[0x0F] = overflow_check;
+                    V[second_digit] = second_digit >> 1;
                     break;
                 }
                 case 0x0007:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    if( V[third_digit] > V[second_digit]){
+                        V[0x0F] = 1;
+                    }
+                    else{
+                        V[0x0F] = 0;
+                    }
+                    V[second_digit] = V[third_digit] - V[second_digit];
                     break;
+                    
                 }
                 case 0x000E:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
+                    uint8_t overflow_check = V[second_digit] & 0x80;
+                    V[0x0F] = overflow_check;
+                    V[second_digit] = second_digit << 1;
                     break;
                 }
                 default:
