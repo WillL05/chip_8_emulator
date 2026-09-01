@@ -19,5 +19,11 @@ private:
 
     // The Program Counter tracks where we are in memory
     uint16_t pc;
+
+    uint16_t stack[16];
+    uint8_t sp;
+    uint8_t sound_timer;
+    uint8_t delay_timer;
+    uint16_t I;
 };
 

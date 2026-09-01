@@ -4,6 +4,7 @@
 #include "cstring"
 using namespace std;
 #include <format>
+#include <cstdlib>
 
 Chip8::Chip8() {
     pc = 0x200; 
@@ -45,7 +46,8 @@ void Chip8::cycle(){
                     break;
                 }
                 case 0x00EE:{
-                    
+                    sp--;
+                    pc = stack[sp];
                     break;
                 }
                 
@@ -59,24 +61,36 @@ void Chip8::cycle(){
 
         case 0x2000:{
             uint16_t last_three_digits = opcode & 0x0FFF;
+            stack[sp] = pc;
+            sp++;
+            pc = last_three_digits;
             break;
         }
 
         case 0x3000:{
             uint8_t second_digit = (opcode & 0x0F00) >> 8;
             uint16_t last_two_digits = opcode & 0x0FF;
+            if(V[second_digit] == last_two_digits){
+                pc += 2;
+            }
             break;
         }
 
         case 0x4000:{
             uint8_t second_digit = (opcode & 0x0F00) >> 8;
             uint16_t last_two_digits = opcode & 0x0FF;
+            if(V[second_digit] != last_two_digits){
+                pc+=2;
+            }
             break;
         }
 
         case 0x5000:{
             uint8_t second_digit = (opcode & 0x0F00) >> 8;
             uint8_t third_digit = (opcode & 0x00F0) >> 4;
+            if(V[second_digit] == V[third_digit]){
+                pc +=2;
+            }
             break;
         }
 
@@ -134,7 +148,7 @@ void Chip8::cycle(){
                 case 0x0005:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
-                    if( V[second_digit] > V[third_digit]){
+                    if( V[second_digit] >= V[third_digit]){
                         V[0x0F] = 1;
                     }
                     else{
@@ -148,13 +162,13 @@ void Chip8::cycle(){
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
                     uint8_t overflow_check = V[second_digit] & 0x01;
                     V[0x0F] = overflow_check;
-                    V[second_digit] = second_digit >> 1;
+                    V[second_digit] = V[second_digit] >> 1;
                     break;
                 }
                 case 0x0007:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
-                    if( V[third_digit] > V[second_digit]){
+                    if( V[third_digit] >= V[second_digit]){
                         V[0x0F] = 1;
                     }
                     else{
@@ -167,9 +181,9 @@ void Chip8::cycle(){
                 case 0x000E:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
                     uint8_t third_digit = (opcode & 0x00F0) >> 4;
-                    uint8_t overflow_check = V[second_digit] & 0x80;
+                    uint8_t overflow_check = (V[second_digit] & 0x80) >> 7;
                     V[0x0F] = overflow_check;
-                    V[second_digit] = second_digit << 1;
+                    V[second_digit] = V[second_digit] << 1;
                     break;
                 }
                 default:
@@ -183,22 +197,28 @@ void Chip8::cycle(){
         case 0x9000:{
             uint8_t second_digit = (opcode & 0x0F00) >> 8;
             uint8_t third_digit = (opcode & 0x00F0) >> 4;
+            if(V[second_digit] != V[third_digit]){
+                pc += 2;
+            }
             break;
         }
             
         case 0xA000:{
             uint16_t last_three_digits = opcode & 0x0FFF;
+            I = last_three_digits;
             break;
         }
 
         case 0xB000:{
             uint16_t last_three_digits = opcode & 0x0FFF;
+            pc = last_three_digits + V[0];
             break;
         }
             
         case 0xC000:{
             uint8_t second_digit = (opcode & 0x0F00) >> 8;
             uint16_t last_two_digits = opcode & 0x0FF;
+            V[second_digit] = (rand() % 256) & last_two_digits;
             break;
         }
 
@@ -232,6 +252,7 @@ void Chip8::cycle(){
             switch (opcode & 0x00FF){
                 case 0x0007:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    V[second_digit] = delay_timer;
                     break;
                 }
                 case 0x000A:{
@@ -241,14 +262,17 @@ void Chip8::cycle(){
                 }
                 case 0x0015:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    delay_timer = V[second_digit];
                     break;
                 }
                 case 0x0018:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    sound_timer = V[second_digit];
                     break;
                 }
                 case 0x001E:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    I += V[second_digit];
                     break;
                 }
                 case 0x0029:{
@@ -261,10 +285,17 @@ void Chip8::cycle(){
                 }
                 case 0x0055:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+
+                    for(int i = 0; i<= second_digit;i++){
+                        memory[I+i] = V[i];
+                    }
                     break;
                 }
                 case 0x0065:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    for(int i = 0; i<= second_digit;i++){
+                        V[i] = memory[I+i];
+                    }
                     break;
                 }
                 default:
