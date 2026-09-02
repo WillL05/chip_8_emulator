@@ -258,10 +258,16 @@ void Chip8::cycle(){
             switch(opcode & 0x00FF){
                 case 0x009E:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    if (keypad[V[second_digit]] == 1){
+                        pc += 2;
+                    }
                     break;
                 }
                 case 0x00A1:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    if (keypad[V[second_digit]] == 0){
+                        pc += 2;
+                    }
                     break;
                 }
                 default:
@@ -281,6 +287,14 @@ void Chip8::cycle(){
                 }
                 case 0x000A:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    for(int i =0; i < 16; i++){
+                        if(keypad[i] == 1){
+                            break;
+                        }
+                        else{
+                            pc -= 2;
+                        }
+                    }
                     break;
 
                 }
@@ -301,10 +315,27 @@ void Chip8::cycle(){
                 }
                 case 0x0029:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    uint8_t character = V[second_digit];
+                    I = 0x050 + (character *5); 
                     break;
                 }
                 case 0x0033:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    int tens = (second_digit % 100) - (second_digit % 10);
+                    int ones = second_digit % 10;
+                    int hundreds = second_digit - (second_digit % 100);
+                    for(int i = 0; i <3;i++){
+                        if (i == 0){
+                            memory[I+i] = hundreds;
+                        }
+                        else if(i == 1){
+                            memory[I+i] = tens;
+                        }
+                        else{
+                            memory[I+i] = ones;
+                        }
+                        
+                    }
                     break;
                 }
                 case 0x0055:{
@@ -334,6 +365,7 @@ void Chip8::cycle(){
             break;
     }
 }
+
 
 
 int main(int argc, char* argv[]) {
