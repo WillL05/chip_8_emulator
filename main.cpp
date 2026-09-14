@@ -5,6 +5,9 @@
 using namespace std;
 #include <format>
 #include <cstdlib>
+#include <chrono>
+#include <thread>
+#include <SFML/Graphics.hpp>
 
 Chip8::Chip8() {
     pc = 0x200; 
@@ -43,12 +46,7 @@ void Chip8::cycle(){
         case 0x0000: {
             switch (opcode & 0x0FFF){
                 case 0x00E0:{
-                    for(int i = 0; i<= 64; i++){ //length 64 pixels
-                        for(int x = 0; x <= 32; x++){ // width 32 pixels
-                            display[i,x] = 0;
-                        }
-                    }
-                    break;
+                    memset(display, 0, sizeof(display));
                 }
                 case 0x00EE:{
                     sp--;
@@ -251,8 +249,8 @@ void Chip8::cycle(){
                     }
                 }
 
-            break;
             }
+            break;
         }
         case 0xE000:{
             switch(opcode & 0x00FF){
@@ -287,13 +285,16 @@ void Chip8::cycle(){
                 }
                 case 0x000A:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
+                    bool key_pressed = false;
                     for(int i =0; i < 16; i++){
                         if(keypad[i] == 1){
+                            V[second_digit] = i;
+                            key_pressed = true;
                             break;
                         }
-                        else{
-                            pc -= 2;
-                        }
+                    }
+                    if(!key_pressed){
+                        pc -= 2;
                     }
                     break;
 
@@ -321,9 +322,9 @@ void Chip8::cycle(){
                 }
                 case 0x0033:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
-                    int tens = (second_digit % 100) - (second_digit % 10);
-                    int ones = second_digit % 10;
-                    int hundreds = second_digit - (second_digit % 100);
+                    int tens = (V[second_digit] % 100) - (V[second_digit] % 10);
+                    int ones = V[second_digit] % 10;
+                    int hundreds = V[second_digit] - (V[second_digit] % 100);
                     for(int i = 0; i <3;i++){
                         if (i == 0){
                             memory[I+i] = hundreds;
@@ -366,6 +367,14 @@ void Chip8::cycle(){
     }
 }
 
+void Chip8::tickTimers(){
+    if(delay_timer > 0){
+        delay_timer--;
+    } 
+    if(sound_timer > 0){
+        sound_timer--;
+    }
+}
 
 
 int main(int argc, char* argv[]) {
@@ -375,7 +384,29 @@ int main(int argc, char* argv[]) {
     }
     Chip8 myEmulator;
     myEmulator.loadROM(argv[1]);
-    myEmulator.cycle();
+
+    const int scale = 15;
+    sf::RenderWindow window(sf::VideoMode({64*scale,32*scale}),"CHIP-8 Emulator");
+    auto last_timer_time = chrono::high_resolution_clock::now();
+    while (window.isOpen()){
+        sf::Event event;
+        while(window.pollEvent(event));
+            if(sf::Event::Closed){
+                window.close();
+            }
+            else if(sf::Event::KeyPressed || sf::Event::KeyReleased){
+                
+            }
+        myEmulator.cycle();
+        auto curr_timer_time = chrono::high_resolution_clock::now();
+        chrono::duration<double> elapsed = curr_timer_time - last_timer_time;
+        auto comparison = chrono::microseconds(16667);
+        if(elapsed >= comparison ){
+            myEmulator.tickTimers();
+            last_timer_time = curr_timer_time;
+        }
+        std::this_thread::sleep_for (std::chrono::microseconds(2000));
+    }
     return 0;
 }
 
