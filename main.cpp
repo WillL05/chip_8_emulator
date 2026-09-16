@@ -389,13 +389,122 @@ int main(int argc, char* argv[]) {
     sf::RenderWindow window(sf::VideoMode({64*scale,32*scale}),"CHIP-8 Emulator");
     auto last_timer_time = chrono::high_resolution_clock::now();
     while (window.isOpen()){
+        uint8_t* keypad = myEmulator.access_keypad();
         sf::Event event;
         while(window.pollEvent(event));
             if(sf::Event::Closed){
                 window.close();
             }
-            else if(sf::Event::KeyPressed || sf::Event::KeyReleased){
-                
+            else if(sf::Event::KeyPressed ){
+                switch(event.key.code){
+                    case sf::Keyboard::Num1: 
+                        keypad[0x1] = 1;
+                        break;
+                    case sf::Keyboard::Num2: 
+                        keypad[0x2] = 1;
+                        break;
+                    case sf::Keyboard::Num3: 
+                        keypad[0x3] = 1;
+                        break;
+                    case sf::Keyboard::Num4: 
+                        keypad[0xC] = 1;
+                        break;
+                    
+                    case sf::Keyboard::Q: 
+                        keypad[0x4] = 1;
+                        break;
+                    case sf::Keyboard::W: 
+                        keypad[0x5] = 1;
+                        break;
+                    case sf::Keyboard::E: 
+                        keypad[0x6] = 1;
+                        break;
+                    case sf::Keyboard::R: 
+                        keypad[0xD] = 1;
+                        break;
+
+                    case sf::Keyboard::A: 
+                        keypad[0x7] = 1;
+                        break;
+                    case sf::Keyboard::S: 
+                        keypad[0x8] = 1;
+                        break;
+                    case sf::Keyboard::D:
+                        keypad[0x9] = 1;
+                        break;
+                    case sf::Keyboard::F: 
+                        keypad[0xE] = 1;
+                        break;
+
+                    case sf::Keyboard::Z: 
+                        keypad[0xA] = 1;
+                        break;
+                    case sf::Keyboard::X: 
+                        keypad[0x0] = 1;
+                        break;
+                    case sf::Keyboard::C: 
+                        keypad[0xB] = 1;
+                        break;
+                    case sf::Keyboard::V: 
+                        keypad[0xF] = 1;
+                        break;
+                }
+            }
+            else if(sf::Event::KeyReleased){
+                switch(event.key.code){
+                    case sf::Keyboard::Num1: 
+                        keypad[0x1] = 0;
+                        break;
+                    case sf::Keyboard::Num2: 
+                        keypad[0x2] = 0;
+                        break;
+                    case sf::Keyboard::Num3: 
+                        keypad[0x3] = 0;
+                        break;
+                    case sf::Keyboard::Num4: 
+                        keypad[0xC] = 0;
+                        break;
+                    
+                    case sf::Keyboard::Q: 
+                        keypad[0x4] = 0;
+                        break;
+                    case sf::Keyboard::W: 
+                        keypad[0x5] = 0;
+                        break;
+                    case sf::Keyboard::E: 
+                        keypad[0x6] = 0;
+                        break;
+                    case sf::Keyboard::R: 
+                        keypad[0xD] = 0;
+                        break;
+
+                    case sf::Keyboard::A: 
+                        keypad[0x7] = 0;
+                        break;
+                    case sf::Keyboard::S: 
+                        keypad[0x8] = 0;
+                        break;
+                    case sf::Keyboard::D:
+                        keypad[0x9] = 0;
+                        break;
+                    case sf::Keyboard::F: 
+                        keypad[0xE] = 0;
+                        break;
+
+                    case sf::Keyboard::Z: 
+                        keypad[0xA] = 0;
+                        break;
+                    case sf::Keyboard::X: 
+                        keypad[0x0] = 0;
+                        break;
+                    case sf::Keyboard::C: 
+                        keypad[0xB] = 0;
+                        break;
+                    case sf::Keyboard::V: 
+                        keypad[0xF] = 0;
+                        break;
+                }
+
             }
         myEmulator.cycle();
         auto curr_timer_time = chrono::high_resolution_clock::now();
@@ -404,6 +513,20 @@ int main(int argc, char* argv[]) {
         if(elapsed >= comparison ){
             myEmulator.tickTimers();
             last_timer_time = curr_timer_time;
+            sf::Color::Black;
+            sf::RectangleShape Rectangle;
+            Rectangle.setSize(sf::Vector2f(scale,scale));
+            Rectangle.setFillColor(sf::Color::White);
+            uint8_t* display = myEmulator.access_display();
+            int X;
+            int Y;
+            for(int i = 0;i<=2047;i++){
+                if(display[i] == 1){
+                    X = (i % 64) * scale;
+                    Y = (i / 64) * scale;
+                    Rectangle.setPosition(X,Y);
+                }
+            }
         }
         std::this_thread::sleep_for (std::chrono::microseconds(2000));
     }
