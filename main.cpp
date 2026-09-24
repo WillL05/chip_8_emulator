@@ -10,8 +10,18 @@ using namespace std;
 #include <SFML/Graphics.hpp>
 
 Chip8::Chip8() {
+    memset(memory, 0, sizeof(memory));
+    memset(display, 0, sizeof(display));
+    memset(V, 0, sizeof(V));
+    I = 0;
+    sp = 0;
+    delay_timer = 0;
+    sound_timer = 0;
     pc = 0x200; 
     std::cout << "CHIP-8 CPU Initialized. Program Counter set to 0x200." << endl;
+    for(int i = 0; i<80;i++){
+        memory[0x050 + i] = fontset[i];
+    }
 }
 
 bool Chip8::loadROM(const char* filename) {
@@ -47,6 +57,7 @@ void Chip8::cycle(){
             switch (opcode & 0x0FFF){
                 case 0x00E0:{
                     memset(display, 0, sizeof(display));
+                    break;
                 }
                 case 0x00EE:{
                     sp--;
@@ -55,10 +66,12 @@ void Chip8::cycle(){
                 }
                 
             }
+            break;
         }
 
         case 0x1000:{
             uint16_t last_three_digits = opcode & 0x0FFF;
+            pc = last_three_digits;
             break;
         }
 
@@ -100,12 +113,14 @@ void Chip8::cycle(){
         case 0x6000:{
             uint8_t second_digit = (opcode & 0x0F00) >> 8;
             uint16_t last_two_digits = opcode & 0x0FF;
+            V[second_digit] = last_two_digits;
             break;
         }
 
         case 0x7000:{
             uint8_t second_digit = (opcode & 0x0F00) >> 8;
             uint16_t last_two_digits = opcode & 0x0FF;
+            V[second_digit] += last_two_digits;
             break;
         }
 
@@ -322,9 +337,9 @@ void Chip8::cycle(){
                 }
                 case 0x0033:{
                     uint8_t second_digit = (opcode & 0x0F00) >> 8;
-                    int tens = (V[second_digit] % 100) - (V[second_digit] % 10);
+                    int tens = (V[second_digit] /10) % 10;
                     int ones = V[second_digit] % 10;
-                    int hundreds = V[second_digit] - (V[second_digit] % 100);
+                    int hundreds = (V[second_digit] /100);
                     for(int i = 0; i <3;i++){
                         if (i == 0){
                             memory[I+i] = hundreds;
@@ -391,11 +406,12 @@ int main(int argc, char* argv[]) {
     while (window.isOpen()){
         uint8_t* keypad = myEmulator.access_keypad();
         sf::Event event;
-        while(window.pollEvent(event));
-            if(sf::Event::Closed){
+        while(window.pollEvent(event)){
+    
+            if(event.type == sf::Event::Closed){
                 window.close();
             }
-            else if(sf::Event::KeyPressed ){
+            else if(event.type == sf::Event::KeyPressed ){
                 switch(event.key.code){
                     case sf::Keyboard::Num1: 
                         keypad[0x1] = 1;
@@ -450,7 +466,8 @@ int main(int argc, char* argv[]) {
                         break;
                 }
             }
-            else if(sf::Event::KeyReleased){
+            else if(event.type == sf::Event::KeyReleased){
+
                 switch(event.key.code){
                     case sf::Keyboard::Num1: 
                         keypad[0x1] = 0;
@@ -506,14 +523,15 @@ int main(int argc, char* argv[]) {
                 }
 
             }
-        myEmulator.cycle();
+        }
+            myEmulator.cycle();
         auto curr_timer_time = chrono::high_resolution_clock::now();
         chrono::duration<double> elapsed = curr_timer_time - last_timer_time;
         auto comparison = chrono::microseconds(16667);
         if(elapsed >= comparison ){
             myEmulator.tickTimers();
             last_timer_time = curr_timer_time;
-            sf::Color::Black;
+            window.clear(sf::Color::Black);
             sf::RectangleShape Rectangle;
             Rectangle.setSize(sf::Vector2f(scale,scale));
             Rectangle.setFillColor(sf::Color::White);
@@ -525,8 +543,10 @@ int main(int argc, char* argv[]) {
                     X = (i % 64) * scale;
                     Y = (i / 64) * scale;
                     Rectangle.setPosition(X,Y);
+                    window.draw(Rectangle);
                 }
             }
+            window.display();
         }
         std::this_thread::sleep_for (std::chrono::microseconds(2000));
     }
