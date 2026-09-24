@@ -25,7 +25,8 @@ Clone the repository and compile the source files directly using `g++`. Ensure y
 g++ main.cpp chip8.cpp -o chip8 -lsfml-graphics -lsfml-window -lsfml-system
 ```
 **Usage:**
-The emulator runs via the command line and requires the filepath to a valid `.ch8` as an argument.
+The emulator runs via the command line and requires the filepath to a valid `.ch8` as an argument. 
+These can be found online and on Github.
 
 ```bash
 ./chip8 path/to/rom/Tetris.ch8
